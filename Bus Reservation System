@@ -1,0 +1,237 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+
+struct Bus
+{
+    int bus_no;
+    char from[10];
+    char desti[10];
+    char timee[10];
+    int fare;
+    int avail;
+    
+    struct reserv_seat
+    {
+        int sr;
+        char seat[10], name[10];
+    }r[10];
+    
+}b[5];
+
+void Sign_In()
+{
+    FILE *ptr;
+    char user[10],a[10],b[10], pass[10];
+    
+    ptr=fopen("signIn.txt","r");
+    
+    fscanf(ptr,"%s",a);
+    fscanf(ptr,"%s",b);
+    
+    printf("\n \t\tWelcome, Please Enter the Login Credintials\n");
+    printf("\n Username: ");
+    scanf("%s", user);
+    printf("\n Password: ");
+    scanf("%s", pass);
+
+    if(strcmp(user,a)==0 && strcmp(pass,b)==0)
+        {
+            printf("Login Successful...");
+        }
+        else{
+            printf("Invalid Username or Password...");
+            exit(0);
+        }
+}
+
+void Initialize_buses()
+{
+    int b_no, fa;
+    char fr[10], to[10], tim[10];
+    FILE *fp;
+    fp = fopen("file.txt", "r");
+    
+    for(int i=0;i<5;i++)
+    {
+        fscanf(fp,"%d%s%s%s%d",&b_no,fr,to,tim,&fa);
+        b[i].bus_no=b_no;
+        strcpy(b[i].from,fr);
+        strcpy(b[i].desti,to);
+        strcpy(b[i].timee,tim);
+        b[i].fare=fa;
+    }
+    fclose(fp);
+    
+}
+
+void Initialize_Seats()
+{
+    for(int i=0;i<5;i++)
+    {
+        b[i].avail=10;
+        for(int j=0;j<10;j++)
+         {
+            b[i].r[j].sr=j+1;
+            strcpy(b[i].r[j].seat,"vacant");
+            strcpy(b[i].r[j].name,"none");
+        }
+    }
+}
+
+void disp_buses()
+{
+    printf("bus_no  from    to      time_r  fare\n\n");
+    for(int i=0;i<5;i++)
+    {
+        printf("%d\t%s\t%s\t%s\t%d\n",b[i].bus_no,b[i].from,b[i].desti,b[i].timee,b[i].fare);
+    }
+
+    
+}
+
+void disp_Seats(int i)
+{
+    printf("\nThe Available Seats Are:\t%d\n",b[i].avail);
+    printf("\nSr.no\t Type of Status\t Name of Visiotor\n");
+    for(int j=0;j<10;j++)
+    {
+        printf("%d\t  %s\t\t %s\n",b[i].r[j].sr,b[i].r[j].seat,b[i].r[j].name);
+    }
+    /*for(int i=0;i<5;i++)
+    {
+        printf("\n");
+        for(int j=0;j<10;j++)
+        {
+            printf("%d\t  %s\t\t %s\n",b[i].r[j].sr,b[i].r[j].seat,b[i].r[j].name);
+        }
+    }*/
+}
+
+int find_bus(int no)
+{
+    for(int i=0;i<5;i++)
+    {
+        if(no==b[i].bus_no)
+        {
+            return i;
+        }
+    }
+}
+
+int update(int i)
+{
+    FILE *fp;
+    int s, init;
+    char name[10];
+    printf("\n How many seats do you want to reserve:\t");
+    scanf("%d",&s);
+    
+    if(s<=b[i].avail)
+    {
+        fp=fopen("Booking_Details.txt","a");
+        init=abs(b[i].avail-10);
+        for(int j=init;j<(init+s);j++)
+        {
+            strcpy(b[i].r[j].seat,"Allocate");
+            printf("\n Enter the name:\t");
+            scanf("%s",name);
+            strcpy(b[i].r[j].name,name);
+            fprintf(fp,"\n%s\t\t%d\t\t%s\t\t%s\t\t%s\t\t%d\n",name,b[i].bus_no,b[i].from,b[i].desti,b[i].timee,b[i].fare);
+        }
+        fprintf(fp,"The Total amount is:\t%d\n",b[i].fare*s);
+        fprintf(fp,"--------------------------------------------------------------------------------\n");
+        fclose(fp);
+        b[i].avail-=s;
+    }
+    else
+    {
+        printf("\nOnly %d Seats Are Available",b[i].avail);
+    }
+    
+    return s;
+}
+
+void payment(int i, int s)
+{
+    int total;
+    total=b[i].fare*s;
+    printf("\n The Total amount you have to pay is:\t%d",total);
+}
+
+void booking_Details(int i)
+{
+    disp_Seats(i);
+}
+
+int Reserve()
+{
+    int b_n;
+    
+    printf("\n Enter the Bus Number you want to travel from:\t");
+    scanf("%d",&b_n);
+    
+    b_n=find_bus(b_n);
+    
+    printf("\n The Available Seats are as follows:\t");
+    disp_Seats(b_n);
+    
+    return b_n;
+}
+
+int main()
+{
+    Sign_In();
+    int choice, b, w, s;
+    
+    do{
+        printf("\n****************************************");
+        printf("        BUS RESERVATION SYSTEM          ");
+        printf("****************************************");
+        
+        printf("\n1.Show Buses\n2.Reserve\n3.Payment\n4.Booking Details\n5.Exit");
+        printf("\n Enter Your Choice:\t");
+        scanf("%d",&choice);
+        
+        switch(choice)
+        {
+            case 1:
+                Initialize_buses();
+                Initialize_Seats();
+                disp_buses();
+                break;
+                
+            case 2:
+                b=Reserve();
+                printf("\n To continue the Reservation of Seats in this Bus:\tType 1\t else Type 0:\t");
+                scanf("%d",&w);
+                
+                if(w==1)
+                {
+                    s=update(b);
+                }
+                else
+                {
+                    exit(0);
+                }
+                break;
+                
+            case 3:
+                payment(b,s);
+                break;
+                
+            case 4:
+                booking_Details(b);
+                break;
+                
+            case 5:
+                exit(0);
+                break;
+                
+            default:
+                printf("\n Invalid Choice...");
+        }
+    }while(1);
+    
+    return 0;
+}
