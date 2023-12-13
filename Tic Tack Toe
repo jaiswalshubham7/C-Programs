@@ -1,0 +1,183 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+char a[3][3];
+int arr[10];
+int p1=0,p2=0;
+
+void init()
+{
+    for(int i=0; i<3;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+            a[i][j]='-';
+        }
+    }
+}
+
+void disp()
+{
+    for(int i=0; i<3;i++)
+        {
+            printf("\n");
+            printf("\t------------------");
+            printf("\n");
+            for(int j=0;j<3;j++)
+            {
+                printf("\t%c",a[i][j]);
+            }
+        }
+}
+
+update(int no,char s)
+{
+    if(no==1)
+    {
+        a[0][0]=s;
+    }
+    else if(no==2)
+    {
+        a[0][1]=s;
+    }
+    else if(no==3)
+    {
+        a[0][2]=s;
+    }
+    else if(no==4)
+    {
+        a[1][0]=s;
+    }
+    else if(no==5)
+    {
+        a[1][1]=s;
+    }
+    else if(no==6)
+    {
+        a[1][2]=s;
+    }
+    else if(no==7)
+    {
+        a[2][0]=s;
+    }
+    else if(no==8)
+    {
+        a[2][1]=s;
+    }
+    else if(no==9)
+    {
+        a[2][2]=s;
+    }
+    
+}
+
+void check()
+{
+    if((a[0][0]=='x' && a[0][1]=='x' && a[0][2]=='x') || 
+    (a[1][0]=='x' && a[1][1]=='x' && a[1][2]=='x') || 
+    (a[2][0]=='x' && a[2][1]=='x' && a[2][2]=='x') ||
+    (a[0][0]=='x' && a[1][1]=='x' && a[2][2]=='x') ||
+    (a[0][2]=='x' && a[1][1]=='x' && a[2][0]=='x'))
+    {
+        printf("\nPlayer 'x' Wins...");
+        p1++;
+        point_table();
+    }
+    if((a[0][0]=='o' && a[0][1]=='o' && a[0][2]=='o') || 
+    (a[1][0]=='o' && a[1][1]=='o' && a[1][2]=='o') || 
+    (a[2][0]=='o' && a[2][1]=='o' && a[2][2]=='o') ||
+    (a[0][0]=='o' && a[1][1]=='o' && a[2][2]=='o') ||
+    (a[0][2]=='o' && a[1][1]=='o' && a[2][0]=='o'))
+    {
+        printf("\nPlayer 'o' Wins...");
+        p2++;
+        point_table();
+    }
+}
+
+void point_table()
+{
+    int c;
+    printf("\nPlayer X = %d \nPlayer O = %d",p1,p2);
+    init();
+    printf("\n\nDo you want to Continue Type 1:\t");
+    scanf("%d",&c);
+    if(c!=1)
+    {
+        exit(0);
+    }
+    
+}
+
+int set(int p)
+{
+    for(int i=0;i<9;i++)
+    {
+        if(arr[i]==p)
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int main()
+{
+    int no, tog=1, count=0;
+
+    init();
+    
+    do
+    {
+        disp();
+        
+        if(tog==1)
+        {
+            printf("\nPlayer 1:\t");
+            scanf("%d",&no);
+            if(set(no)==0)
+            {
+                arr[count]=no;
+                update(no, 'x');
+                tog=0;
+                count++;
+            }
+            else
+            {
+                printf("\nWrong Choice...");
+            }
+        }
+        else
+        {
+            printf("\nPlayer 2:\t");
+            scanf("%d",&no);
+            if(set(no)==0)
+            {
+                arr[count]=no;
+                update(no, 'o');
+                tog=1;
+                count++;
+            }
+            else
+            {
+                printf("\nWrong Choice...");
+            }
+        }
+        
+        check();
+        
+        if(count==9)
+        {
+            printf("\nNo body Wins...MATCH DRAW...");
+            point_table();
+        }
+        
+    }while(1);
+
+    return 0;
+}
+
+
+
+
